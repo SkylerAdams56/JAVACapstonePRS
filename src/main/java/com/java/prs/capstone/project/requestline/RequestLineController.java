@@ -28,41 +28,41 @@ public class RequestLineController {
 	@Autowired
 	private RequestRepository reqRepo;
 	
-	private boolean recalculateRequestTotal(@PathVariable int RequestId){
-		Optional<Request> anRequest = reqRepo.findById(RequestId);
-		if(anRequest.isEmpty()) {
+	private boolean recalculateRequestTotal(@PathVariable int requestId){
+		Optional<Request> aRequest = reqRepo.findById(requestId);
+		if(aRequest.isEmpty()) {
 			return false;
 		}
-		Request Request = anRequest.get();
-		Iterable<RequestLine> RequestLines = reqLRepo.findByRequestId(RequestId);
+		Request request = aRequest.get();
+		Iterable<RequestLine> requestLines = reqLRepo.findByRequestId(requestId);
 		double grandTotal = 0;
-		for(RequestLine rl : RequestLines) {
+		for(RequestLine rl : requestLines) {
 			var lineTotal = rl.getQuantity() * rl.getProduct().getPrice();
 			grandTotal += lineTotal;
 		}
-		Request.setTotal(grandTotal);
-		reqRepo.save(Request);
+		request.setTotal(grandTotal);
+		reqRepo.save(request);
 		return true;
 	}
 	
 	@GetMapping
 	public ResponseEntity<Iterable<RequestLine>> getRequestLines(){
-		Iterable<RequestLine> RequestLines = reqLRepo.findAll();
-		return new ResponseEntity<Iterable<RequestLine>>(RequestLines, HttpStatus.OK);
+		Iterable<RequestLine> requestLines = reqLRepo.findAll();
+		return new ResponseEntity<Iterable<RequestLine>>(requestLines, HttpStatus.OK);
 	}
 	
 	@GetMapping("{id}")
 	public ResponseEntity<RequestLine> getRequestLine(@PathVariable int id){
-		Optional<RequestLine> RequestLine = reqLRepo.findById(id);
-		if(RequestLine.isEmpty()) {
+		Optional<RequestLine> requestLine = reqLRepo.findById(id);
+		if(requestLine.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<RequestLine>(RequestLine.get(), HttpStatus.OK);
+		return new ResponseEntity<RequestLine>(requestLine.get(), HttpStatus.OK);
 	}
 	@PostMapping
-	public ResponseEntity<RequestLine> postRequestLine(@RequestBody RequestLine RequestLine){
-		RequestLine newRequestLine = reqLRepo.save(RequestLine);
-		Optional<Request> Request = reqRepo.findById(RequestLine.getRequest().getId());
+	public ResponseEntity<RequestLine> postRequestLine(@RequestBody RequestLine requestLine){
+		RequestLine newRequestLine = reqLRepo.save(requestLine);
+		Optional<Request> Request = reqRepo.findById(requestLine.getRequest().getId());
 		if(!Request.isEmpty()) {
 			boolean success = recalculateRequestTotal(Request.get().getId());
 			if(!success) {
@@ -74,12 +74,12 @@ public class RequestLineController {
 	
 	@SuppressWarnings("rawtypes")
 	@PutMapping("{id}")
-	public ResponseEntity putRequestLine(@PathVariable int id, @RequestBody RequestLine RequestLine) {
-		if(RequestLine.getId() != id) {
+	public ResponseEntity putRequestLine(@PathVariable int id, @RequestBody RequestLine requestLine) {
+		if(requestLine.getId() != id) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		}
-		reqLRepo.save(RequestLine);
-		Optional<Request> Request = reqRepo.findById(RequestLine.getRequest().getId());
+		reqLRepo.save(requestLine);
+		Optional<Request> Request = reqRepo.findById(requestLine.getRequest().getId());
 		if(!Request.isEmpty()) {
 			boolean success = recalculateRequestTotal(Request.get().getId());
 			if(!success) {
@@ -92,12 +92,12 @@ public class RequestLineController {
 	@SuppressWarnings("rawtypes")
 	@DeleteMapping("{id}")
 	public ResponseEntity deleteRequestLine(@PathVariable int id) {
-		Optional<RequestLine> RequestLine = reqLRepo.findById(id);
-		if(RequestLine.isEmpty()) {
+		Optional<RequestLine> requestLine = reqLRepo.findById(id);
+		if(requestLine.isEmpty()) {
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		}
-		reqLRepo.delete(RequestLine.get());
-		Optional<Request> Request = reqRepo.findById(RequestLine.get().getRequest().getId());
+		reqLRepo.delete(requestLine.get());
+		Optional<Request> Request = reqRepo.findById(requestLine.get().getRequest().getId());
 		if(!Request.isEmpty()) {
 			boolean success = recalculateRequestTotal(Request.get().getId());
 			if(!success) {

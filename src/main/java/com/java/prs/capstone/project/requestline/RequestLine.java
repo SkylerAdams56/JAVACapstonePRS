@@ -18,7 +18,7 @@ public class RequestLine {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	private int quantity = 1;
+	private int quantity = 0;
 	@JsonBackReference
 	@ManyToOne(optional=false)
 	@JoinColumn(name="requestId")
@@ -36,7 +36,9 @@ public class RequestLine {
 		return quantity;
 	}
 	public void setQuantity(int quantity) {
-		this.quantity = quantity;
+		if(quantity >= 1) {
+			this.quantity = quantity;
+		}
 	}
 	public Request getRequest() {
 		return request;
