@@ -20,7 +20,7 @@ import com.java.prs.capstone.project.request.RequestRepository;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/RequestLines")
+@RequestMapping("/api/requestlines")
 public class RequestLineController {
 	
 	@Autowired
